@@ -3,9 +3,9 @@
 > **Automated verification & Minimal Failing Map pruner for procedural game worlds.**  
 > *Catch the 0.05% softlock bug before your Steam players do.*
 
-[![CI](https://github.com/Genesis410/Ariadne/actions/workflows/ci.yml/badge.svg)](https://github.com/Genesis410/Ariadne/actions/workflows/ci.yml)
+[![CI](https://github.com/Genesis410/Ariadne/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Genesis410/Ariadne/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue.svg)]()
-[![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Linux-lightgrey.svg)]()
+[![OS](https://img.shields.io/badge/OS-Windows%20%7C%20Linux-blue.svg)]()
 [![Engines](https://img.shields.io/badge/engines-Godot%20%7C%20Unity%20%7C%20Python%20%7C%20Rust%20%7C%20C%2B%2B-purple.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
