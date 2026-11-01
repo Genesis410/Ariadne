@@ -17,7 +17,6 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from ariadne import __version__
 from ariadne.core.config import load_config
 from ariadne.core.errors import AriadneError, ConfigError
 from ariadne.license.verifier import get_active_license
@@ -51,7 +50,10 @@ def init(
         console.print("[yellow]ariadne.toml already exists. Use --force to overwrite.[/yellow]")
         raise typer.Exit(code=2)
 
-    template_dir = Path(__file__).parent / "templates"
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        template_dir = Path(sys._MEIPASS) / "ariadne" / "cli" / "templates"
+    else:
+        template_dir = Path(__file__).parent / "templates"
 
     if template.lower() == "python":
         adapter_src = template_dir / "sample_generator.py"

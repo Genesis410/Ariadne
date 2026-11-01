@@ -1,6 +1,6 @@
 """Atropos: Minimal Failing Map shrinker via rectangular Bounding-Box Pruning."""
 
-from typing import Callable, Optional, Set, Tuple
+from typing import Callable, Set, Tuple
 from ariadne.core.models import PrunedSubgrid, WorldGrid
 
 

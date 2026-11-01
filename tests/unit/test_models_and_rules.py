@@ -3,7 +3,6 @@
 from ariadne.core.models import WorldGrid
 from ariadne.checker.rules import (
     check_reachability,
-    check_connected_walkable,
     check_key_before_door,
 )
 from ariadne.shrinker.bounding_box import prune_to_minimal_failing_map

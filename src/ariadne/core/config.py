@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import tomllib
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 from pydantic import BaseModel, Field, model_validator
 from ariadne.core.errors import ConfigError
 

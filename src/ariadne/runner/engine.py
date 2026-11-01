@@ -44,7 +44,10 @@ class LabyrinthosRunner:
         # 1. Reachability rule
         if self.config.rules.reachable:
             r_cfg = self.config.rules.reachable
-            check_fn = lambda g: check_reachability(g, from_target=r_cfg.from_point, to_target=r_cfg.to_point)
+
+            def check_fn(g: WorldGrid):
+                return check_reachability(g, from_target=r_cfg.from_point, to_target=r_cfg.to_point)
+
             is_reach, msg, _ = check_fn(grid)
             if not is_reach:
                 return False, "reachable", msg, check_fn

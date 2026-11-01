@@ -1,7 +1,6 @@
 """Persistent subprocess IPC communicator with tagged line protocol and Windows tree-kill."""
 
 import json
-import os
 import queue
 import shlex
 import subprocess

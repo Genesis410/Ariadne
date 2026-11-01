@@ -1,7 +1,7 @@
 """Theseus: Core topological and solvability rule checkers for WorldGrid."""
 
 from collections import deque
-from typing import Dict, List, Optional, Set, Tuple
+from typing import List, Set, Tuple
 from ariadne.core.models import WorldGrid
 
 

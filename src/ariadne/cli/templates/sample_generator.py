@@ -1,13 +1,10 @@
 """Sample procedural dungeon generator with intentional rare softlock bug for Ariadne demo."""
 
 import json
-import random
 import sys
 
 
 def generate_dungeon(seed: int, width: int = 30, height: int = 15):
-    rng = random.Random(seed)
-
     # Initialize with walls
     grid = [["#" for _ in range(width)] for _ in range(height)]
 
