@@ -42,6 +42,9 @@ jobs:
         ARCHIVE_NAME="ariadne-${TAG_NAME}-windows-x64"
         cd dist
         mv ariadne "${ARCHIVE_NAME}"
+        cp ../README.md "${ARCHIVE_NAME}/README.md"
+        cp ../LICENSE "${ARCHIVE_NAME}/LICENSE"
+        cp ../RELEASE_NOTICE.txt "${ARCHIVE_NAME}/RELEASE_NOTICE.txt"
         7z a "${ARCHIVE_NAME}.zip" "${ARCHIVE_NAME}"
         sha256sum "${ARCHIVE_NAME}.zip" > checksums.txt
         cat checksums.txt
@@ -56,9 +59,12 @@ jobs:
         body: |
           ## Ariadne Procedural World Verifier (${{ github.ref_name }})
 
+          > **⚠️ ALPHA PRE-RELEASE**: This is an early technical evaluation build. Protocol specifications and formats may change. Not intended for production use.
+
           ### Windows Distribution (64-bit)
           - Single-folder portable distribution (`--onedir`).
           - Zero Python dependency required. Extract and run `ariadne.exe`.
+          - Bundled with `README.md`, `LICENSE`, and `RELEASE_NOTICE.txt`.
 
           ### Security & Integrity Notice
           - SHA-256 checksum is provided in `checksums.txt`.

@@ -1,0 +1,31 @@
+ARIADNE (v0.1.0-alpha) — RELEASE NOTICE
+========================================
+
+Welcome to the alpha technical preview of Ariadne!
+
+IMPORTANT NOTICES:
+------------------
+1. ALPHA STATUS:
+   This build is an early technical evaluation preview. The black-box streaming
+   protocol (ARIADNE:{...}) and configuration schema are subject to change.
+   Do not use in mission-critical production pipelines without pinning.
+
+2. CODE SIGNING & WINDOWS SMARTSCREEN:
+   This Windows binary is built directly from source via GitHub Actions CI and
+   is currently unsigned. Windows SmartScreen or antivirus software may flag
+   it as "Unknown Publisher".
+
+   To run:
+   - Click "More info"
+   - Click "Run anyway"
+
+   Ariadne is 100% open source under the MIT License and operates entirely offline.
+   Zero network telemetry is collected.
+
+3. QUICK USAGE:
+   - Run `ariadne.exe --help`
+   - In your game project: `ariadne.exe init --template godot4` (or `--template python`)
+   - Test level generation: `ariadne.exe run --seeds 100`
+
+Source & Issue Tracker:
+https://github.com/Genesis410/Ariadne
