@@ -5,12 +5,26 @@ Welcome to the alpha technical preview of Ariadne!
 
 IMPORTANT NOTICES:
 ------------------
-1. ALPHA STATUS:
+1. CLI TOOL USAGE (DO NOT DOUBLE-CLICK):
+   Ariadne is a Command-Line Interface (CLI) tool, NOT a graphical (GUI) app.
+   If you double-click `ariadne.exe` directly in Windows File Explorer, Windows
+   will open a terminal window for a fraction of a second and close immediately.
+
+   How to properly run Ariadne:
+   a. Open the folder containing `ariadne.exe` in Windows File Explorer.
+   b. Click the File Explorer address bar at the top, type `cmd`, and press Enter
+      (or right-click empty space in the folder and select "Open in Terminal").
+   c. Run your commands in the command prompt window:
+      .\ariadne.exe --help
+      .\ariadne.exe init --template python
+      .\ariadne.exe run --seeds 50
+
+2. ALPHA STATUS:
    This build is an early technical evaluation preview. The black-box streaming
    protocol (ARIADNE:{...}) and configuration schema are subject to change.
    Do not use in mission-critical production pipelines without pinning.
 
-2. CODE SIGNING & WINDOWS SMARTSCREEN:
+3. CODE SIGNING & WINDOWS SMARTSCREEN:
    This Windows binary is built directly from source via GitHub Actions CI and
    is currently unsigned. Windows SmartScreen or antivirus software may flag
    it as "Unknown Publisher".
@@ -22,10 +36,15 @@ IMPORTANT NOTICES:
    Ariadne is 100% open source under the MIT License and operates entirely offline.
    Zero network telemetry is collected.
 
-3. QUICK USAGE:
-   - Run `ariadne.exe --help`
-   - In your game project: `ariadne.exe init --template godot4` (or `--template python`)
-   - Test level generation: `ariadne.exe run --seeds 100`
+4. QUICK COMMANDS:
+   - Scaffold project configuration & sample adapter:
+     .\ariadne.exe init --template godot4   # for Godot 4
+     .\ariadne.exe init --template python   # for Python
+   - Run verification:
+     .\ariadne.exe run --seeds 100
+   - Inspect regression vault:
+     .\ariadne.exe vault list
 
 Source & Issue Tracker:
 https://github.com/Genesis410/Ariadne
+

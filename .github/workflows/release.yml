@@ -69,6 +69,14 @@ jobs:
           - Zero Python dependency required. Extract and run `ariadne.exe`.
           - Bundled with `README.md`, `LICENSE`, and `RELEASE_NOTICE.txt`.
 
+          ### How to Run (CLI Tool Notice)
+          - Ariadne is a **terminal command-line tool**, not a desktop GUI.
+          - **Do not double-click `ariadne.exe` directly in File Explorer** (the terminal window will close immediately).
+          - To run: Open the extracted folder, click the address bar, type `cmd`, press **Enter**, then run:
+            ```cmd
+            .\ariadne.exe --help
+            ```
+
           ### Security & Integrity Notice
           - SHA-256 checksum is provided in `checksums.txt`.
           - *Note*: This binary is currently unsigned (built via GitHub Actions CI). Windows SmartScreen may show an unknown publisher warning on first launch. Click **More info -> Run anyway**. Code is 100% open source and reproducible.

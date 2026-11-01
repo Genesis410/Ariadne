@@ -80,10 +80,18 @@ Status: FAILED (Exit Code 1)
 ### 1. Installation
 
 **Option A: Standalone Binary (Windows x64 - No Python Required)**
-1. Download `ariadne-v*-windows-x64.zip` from [GitHub Releases](https://github.com/Genesis410/Ariadne/releases).
-2. Extract the folder anywhere and add it to your `PATH` (or call `ariadne.exe` directly).
-3. Verify integrity with `checksums.txt`.
+1. Download and extract `ariadne-v*-windows-x64.zip` from [GitHub Releases](https://github.com/Genesis410/Ariadne/releases).
+2. **Note on CLI Usage**: Ariadne is a terminal/CLI tool, not a GUI desktop app. Do **not** double-click `ariadne.exe` directly in File Explorer (the terminal will close immediately).
+3. **How to Run**:
+   - Open the extracted folder in File Explorer.
+   - Click the address bar at the top, type `cmd`, and press **Enter** (or right-click empty space and choose **Open in Terminal**).
+   - Run commands:
+     ```cmd
+     .\ariadne.exe --help
+     ```
+4. Verify integrity with `checksums.txt`.
    *(Note: Binary is built transparently via GitHub Actions without a paid code-signing certificate; click "More info -> Run anyway" if Windows SmartScreen prompts on first run).*
+5. *(Optional)* Add the extracted directory to your system `PATH` to run `ariadne` from any directory.
 
 **Option B: Via Python Pip (Windows & Linux)**
 ```bash
