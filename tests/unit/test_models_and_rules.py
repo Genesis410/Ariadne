@@ -111,3 +111,66 @@ def test_key_before_door_softlock():
     is_solvable, msg, visited = check_key_before_door(grid)
     assert is_solvable is False
     assert "blocked by locked door" in msg
+
+
+def test_bounding_box_pruning_on_large_map():
+    """Verify that an 80x50 map shrinks by >90% to isolate the failing component."""
+    width = 80
+    height = 50
+    # Start with all solid walls
+    grid_chars = [["#" for _ in range(width)] for _ in range(height)]
+
+    # Room 1 (Start) at (x: 4..10, y: 4..8)
+    for y in range(4, 9):
+        for x in range(4, 11):
+            grid_chars[y][x] = "."
+    grid_chars[6][6] = "@"
+
+    # Room 2 (Exit) at (x: 16..22, y: 5..9)
+    for y in range(5, 10):
+        for x in range(16, 23):
+            grid_chars[y][x] = "."
+    grid_chars[7][19] = ">"
+
+    # The rest of the 80x50 map contains distant unrelated rooms
+    for y in range(30, 45):
+        for x in range(40, 75):
+            grid_chars[y][x] = "."
+
+    cells = ["".join(row) for row in grid_chars]
+    grid = WorldGrid(
+        width=width,
+        height=height,
+        cells=cells,
+        legend={"#": "wall", ".": "floor", "@": "start", ">": "exit"}
+    )
+
+    is_reach, msg, visited = check_reachability(grid)
+    assert is_reach is False
+
+    pruned = prune_to_minimal_failing_map(
+        grid,
+        rule_name="reachable",
+        failure_description=msg,
+        check_fn=check_reachability,
+    )
+
+    # Subgrid must be massively smaller than 80x50
+    original_area = 80 * 50
+    pruned_area = pruned.subgrid.width * pruned.subgrid.height
+    reduction = (original_area - pruned_area) / original_area
+
+    # Must reduce map area by at least 90%
+    assert reduction > 0.90, f"Expected >90% reduction, got {reduction*100:.1f}%"
+    assert pruned.subgrid.width <= 25
+    assert pruned.subgrid.height <= 15
+    assert pruned.original_width == 80
+    assert pruned.original_height == 50
+
+    # Pruned subgrid must still reliably reproduce the failure
+    sub_reach, _, _ = check_reachability(pruned.subgrid)
+    assert sub_reach is False
+
+    # Label must contain 0-indexed coordinates
+    assert "Subgrid [x:" in pruned.label
+    assert "from original 80x50 (0-indexed)" in pruned.label

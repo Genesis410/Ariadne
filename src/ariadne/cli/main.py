@@ -1,7 +1,7 @@
 """Ariadne root Typer CLI."""
 
+import importlib.resources
 from pathlib import Path
-import shutil
 import sys
 from typing import Optional
 import typer
@@ -50,24 +50,21 @@ def init(
         console.print("[yellow]ariadne.toml already exists. Use --force to overwrite.[/yellow]")
         raise typer.Exit(code=2)
 
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        template_dir = Path(sys._MEIPASS) / "ariadne" / "cli" / "templates"
-    else:
-        template_dir = Path(__file__).parent / "templates"
+    templates_pkg = importlib.resources.files("ariadne.cli") / "templates"
 
     if template.lower() == "python":
-        adapter_src = template_dir / "sample_generator.py"
+        adapter_file = "sample_generator.py"
         adapter_dest = Path("ariadne_adapter.py")
         command_str = "python ariadne_adapter.py"
     else:
-        adapter_src = template_dir / "sample_generator.gd"
+        adapter_file = "sample_generator.gd"
         adapter_dest = Path("ariadne_adapter.gd")
         command_str = "godot_console.exe --headless -s ariadne_adapter.gd"
 
-    # Copy adapter
-    if adapter_src.exists():
-        shutil.copy(adapter_src, adapter_dest)
-        console.print(f"[green][OK][/green] Created starter adapter: [bold]{adapter_dest}[/bold]")
+    # Copy adapter via importlib.resources (portable across source, wheel, and PyInstaller)
+    adapter_bytes = (templates_pkg / adapter_file).read_bytes()
+    adapter_dest.write_bytes(adapter_bytes)
+    console.print(f"[green][OK][/green] Created starter adapter: [bold]{adapter_dest}[/bold]")
 
     # Create ariadne.toml
     toml_content = f"""schema_version = 1

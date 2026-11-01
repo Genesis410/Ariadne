@@ -5,36 +5,38 @@ from ariadne.core.models import WorldGrid
 from ariadne.checker.rules import check_reachability
 
 
+# Fixed golden SHA-256 hashes for cross-platform determinism verification.
+# Linux, Windows, and macOS MUST produce these exact byte-for-byte hashes.
+GOLDEN_GRID_HASHES = {
+    42: "32a3d058171f21c57bce26ab21e3002acb554e780bdb4ea0580c2807c03da47e",
+    50: "70aeec98486c46cf393938963abe107bdf4a68461c858be9561dd221471949df",
+    1337: "32a3d058171f21c57bce26ab21e3002acb554e780bdb4ea0580c2807c03da47e",
+    48213: "32a3d058171f21c57bce26ab21e3002acb554e780bdb4ea0580c2807c03da47e",
+    99999: "32a3d058171f21c57bce26ab21e3002acb554e780bdb4ea0580c2807c03da47e",
+}
+
+GOLDEN_VERDICTS = {
+    42: True,
+    50: False,
+    1337: True,
+    48213: True,
+    99999: True,
+}
+
+
 def test_seed_determinism_across_runs():
-    """Verify that identical seeds produce identical grid hashes and verdicts."""
-    test_seeds = [42, 50, 1337, 48213, 99999]
-
-    # Pre-calculated SHA-256 hashes for reference
-    # Ensuring Linux and Windows produce byte-for-byte identical output
-    first_run_hashes = {}
-    first_run_verdicts = {}
-
-    for s in test_seeds:
+    """Verify that identical seeds produce identical grid hashes and verdicts across OS."""
+    for s, expected_hash in GOLDEN_GRID_HASHES.items():
         raw = generate_dungeon(s)
         grid = WorldGrid.model_validate(raw)
         h = grid.compute_hash()
         is_reach, _, _ = check_reachability(grid)
 
-        first_run_hashes[s] = h
-        first_run_verdicts[s] = is_reach
-
-    # Second pass: must be completely identical
-    for s in test_seeds:
-        raw = generate_dungeon(s)
-        grid = WorldGrid.model_validate(raw)
-        h = grid.compute_hash()
-        is_reach, _, _ = check_reachability(grid)
-
-        assert h == first_run_hashes[s], f"Determinism broken on seed {s}: hash mismatch"
-        assert is_reach == first_run_verdicts[s], f"Verdict mismatch on seed {s}"
-
-    # Specific property invariant check:
-    # Seed 50 has the intentional corridor blockage (seed % 50 == 0)
-    assert first_run_verdicts[50] is False
-    assert first_run_verdicts[42] is True
-    assert first_run_verdicts[1337] is True
+        # Cross-OS golden constant check
+        assert h == expected_hash, (
+            f"Cross-OS determinism broken on seed {s}: "
+            f"got {h}, expected golden {expected_hash}"
+        )
+        assert is_reach == GOLDEN_VERDICTS[s], (
+            f"Verdict mismatch on seed {s}: got {is_reach}, expected {GOLDEN_VERDICTS[s]}"
+        )

@@ -71,12 +71,14 @@ class PrunedSubgrid:
     subgrid: WorldGrid
     rule_violated: str
     failure_description: str
+    fix_hint: Optional[str] = None
+    fix_candidates: List[Tuple[int, int]] = field(default_factory=list)
 
     @property
     def label(self) -> str:
         return (
-            f"Crop (x:{self.x_min}-{self.x_max}, y:{self.y_min}-{self.y_max}) "
-            f"from {self.original_width}x{self.original_height} map"
+            f"Subgrid [x:{self.x_min}..{self.x_max}, y:{self.y_min}..{self.y_max}] "
+            f"({self.subgrid.width}x{self.subgrid.height}) from original {self.original_width}x{self.original_height} (0-indexed)"
         )
 
 

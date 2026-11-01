@@ -1,6 +1,7 @@
 """Rich terminal rendering for progress, maps, and Winnability Reports."""
 
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.text import Text
 from ariadne.core.models import PrunedSubgrid, RunSummary
@@ -22,15 +23,19 @@ def render_header(project_name: str, command: str, licensee: str) -> None:
 
 def render_minimal_failing_map(pruned: PrunedSubgrid, seed: int) -> None:
     """Render Minimal Failing Map with highlighted characters and original coordinates."""
+    fix_set = set(pruned.fix_candidates)
+
     # Build styled ASCII grid
     styled_rows = []
-    for row in pruned.subgrid.cells:
+    for y, row in enumerate(pruned.subgrid.cells):
         t = Text()
-        for ch in row:
-            if ch == "#":
+        for x, ch in enumerate(row):
+            if (x, y) in fix_set:
+                t.append("!", style="bold yellow on red")
+            elif ch == "#":
                 t.append(ch, style="dim white")
             elif ch == ".":
-                t.append(ch, style="dim blue")
+                t.append(ch, style="cyan")
             elif ch == "@":
                 t.append(ch, style="bold cyan")
             elif ch == ">":
@@ -45,23 +50,39 @@ def render_minimal_failing_map(pruned: PrunedSubgrid, seed: int) -> None:
 
     map_display = Text("\n").join(styled_rows)
 
+    hint_line = ""
+    if pruned.fix_hint:
+        hint_line = f"\n- Chokepoint Hint : [bold yellow]{escape(pruned.fix_hint)}[/bold yellow]"
+
     info_panel = (
         f"[bold red]SEED FAILURE DETECTED[/bold red]\n"
         f"- Seed ID        : [bold]{seed}[/bold]\n"
         f"- Rule Violated  : [bold red]{pruned.rule_violated}[/bold red]\n"
-        f"- Explanation    : {pruned.failure_description}\n"
-        f"- Original Crop  : [cyan]{pruned.label}[/cyan]\n"
+        f"- Explanation    : {escape(pruned.failure_description)}\n"
+        f"- Crop Region    : [cyan]{escape(pruned.label)}[/cyan]\n"
+        f"- Coordinates    : 0-indexed, (x=col, y=row), (0,0) at top-left\n"
         f"- Sliced Edges   : Outside boundary verified as solid wall"
+        f"{hint_line}"
     )
 
+    crop_title = escape(
+        f"Minimal Failing Map ({pruned.subgrid.width}x{pruned.subgrid.height}) "
+        f"[x:{pruned.x_min}..{pruned.x_max}, y:{pruned.y_min}..{pruned.y_max}]"
+    )
     console.print(Panel(info_panel, border_style="red", title="Counterexample Details"))
     console.print(
         Panel.fit(
             map_display,
             border_style="red",
-            title=f"Minimal Failing Map ({pruned.subgrid.width}x{pruned.subgrid.height})",
+            title=crop_title,
         )
     )
+    if fix_set:
+        console.print(
+            "  [dim]Legend: [bold cyan]@[/bold cyan] Start, "
+            "[bold red]>[/bold red] Exit, "
+            "[bold yellow on red]![/bold yellow on red] Chokepoint Wall (turning into floor restores path)[/dim]\n"
+        )
 
 
 def render_summary(summary: RunSummary) -> None:

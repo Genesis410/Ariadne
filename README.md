@@ -29,28 +29,32 @@ Manual playtesting **cannot catch a bug that occurs in 1 out of 2,000 seeds**. W
 Ariadne tests **thousands of seeds per minute** using a black-box streaming protocol, checks topological invariants, and produces a **Minimal Failing Map** (the smallest cropped subgrid proving the bug) that you can immediately paste into Discord or a GitHub issue.
 
 ```text
-╭─────────────────────── SEED FAILURE DETECTED ────────────────────────╮
-│ Seed ID        : 48213                                               │
-│ Rule Violated  : reachable (start '@' cannot reach exit '>')         │
-│ Map Dimensions : 80x50 original -> Crop (x:12-23, y:4-11)            │
-│ Sliced Edges   : Outside boundary verified as solid wall             │
-╰──────────────────────────────────────────────────────────────────────╯
-
-Minimal Failing Map (12x8 crop):
-╭──────────────╮
-│ ############ │
-│ #..@.......# │
-│ #.######...# │
-│ #.#    #...# │
-│ #.# >! #...# │
-│ #.######...# │
-│ #..........# │
-│ ############ │
-╰──────────────╯
-Legend:
-  [@] Start position
-  [>] Exit stairs (UNREACHABLE — fully enclosed by '#' wall)
-  [!] Point of failure
+┌────────────────────────── Counterexample Details ───────────────────────────┐
+│ SEED FAILURE DETECTED                                                       │
+│ - Seed ID        : 1350                                                     │
+│ - Rule Violated  : reachable                                                │
+│ - Explanation    : Exit '>' at (x=20, y=6) is unreachable from '@' at (x=5, │
+│ y=5)                                                                        │
+│ - Crop Region    : Subgrid [x:1..21, y:1..10] (21x10) from original 30x15   │
+│ (0-indexed)                                                                 │
+│ - Coordinates    : 0-indexed, (x=col, y=row), (0,0) at top-left             │
+│ - Sliced Edges   : Outside boundary verified as solid wall                  │
+│ - Chokepoint Hint : Opening wall '#' at (x=14, y=6) [subgrid: (13, 5)]      │
+│ bridges '@' to '>'                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─ Minimal Failing Map (21x10) [x:1..21, y:1..10] ─┐
+│ #####################                            │
+│ #..........##########                            │
+│ #..........####.....#                            │
+│ #..........####.....#                            │
+│ #...@......####.....#                            │
+│ #............!.....>#                            │
+│ #..........####.....#                            │
+│ #..........####.....#                            │
+│ #..........####.....#                            │
+│ #####################                            │
+└──────────────────────────────────────────────────┘
+  Legend: @ Start, > Exit, ! Chokepoint Wall (turning into floor restores path)
 
 Regression seed saved to .ariadne/vault.jsonl
 Status: FAILED (Exit Code 1)
@@ -75,6 +79,13 @@ Status: FAILED (Exit Code 1)
 
 ### 1. Installation
 
+**Option A: Standalone Binary (Windows x64 - No Python Required)**
+1. Download `ariadne-v*-windows-x64.zip` from [GitHub Releases](https://github.com/Genesis410/Ariadne/releases).
+2. Extract the folder anywhere and add it to your `PATH` (or call `ariadne.exe` directly).
+3. Verify integrity with `checksums.txt`.
+   *(Note: Binary is built transparently via GitHub Actions without a paid code-signing certificate; click "More info -> Run anyway" if Windows SmartScreen prompts on first run).*
+
+**Option B: Via Python Pip (Windows & Linux)**
 ```bash
 git clone https://github.com/Genesis410/Ariadne.git
 cd Ariadne

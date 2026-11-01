@@ -6,6 +6,7 @@ from ariadne.checker.rules import (
     check_connected_walkable,
     check_key_before_door,
     check_reachability,
+    find_single_wall_fix_candidates,
 )
 from ariadne.core.config import AriadneConfig
 from ariadne.core.errors import (
@@ -89,6 +90,23 @@ class LabyrinthosRunner:
                     failure_description=fail_msg or "",
                     check_fn=check_fn,
                 )
+                # Compute single-wall fix hint for reachability failures
+                if rule_name == "reachable" and self.config.rules.reachable:
+                    r_cfg = self.config.rules.reachable
+                    cands = find_single_wall_fix_candidates(
+                        pruned.subgrid,
+                        from_target=r_cfg.from_point,
+                        to_target=r_cfg.to_point,
+                    )
+                    if cands:
+                        pruned.fix_candidates = cands
+                        cx, cy = cands[0]
+                        orig_x = pruned.x_min + cx
+                        orig_y = pruned.y_min + cy
+                        pruned.fix_hint = (
+                            f"Opening wall '#' at (x={orig_x}, y={orig_y}) "
+                            f"[subgrid: ({cx}, {cy})] bridges '{r_cfg.from_point}' to '{r_cfg.to_point}'"
+                        )
 
             res = SeedResult(
                 seed=seed,

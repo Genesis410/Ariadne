@@ -69,3 +69,47 @@ for line in sys.stdin:
         assert "Circuit breaker tripped" in str(exc_info.value)
     finally:
         runner.close()
+
+
+def test_engine_banner_and_log_noise_immunity(tmp_path):
+    """Verify that Godot/Unity engine boot banners and stdout noise are cleanly ignored."""
+    script_path = tmp_path / "noisy_godot_mock.py"
+    script_path.write_text("""import sys, json
+# Simulate Godot 4 / Unity boot banners and logging
+print("Godot Engine v4.3.stable.official.77daca970 - https://godotengine.org", flush=True)
+print("Vulkan API 1.2.0 - Forward+ - Using Vulkan Device #0: NVIDIA GeForce RTX", flush=True)
+print("WARNING: Shader compilation cache took 142ms", flush=True)
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    req = json.loads(line)
+    # Random debug print before response
+    print(f"[DEBUG] Processing procgen request for seed {req.get('seed')}", flush=True)
+    # Legitimate Ariadne response
+    print('ARIADNE:{"width": 3, "height": 3, "cells": ["###", "#@>", "###"], "legend": {"#": "wall", "@": "start", ">": "exit"}}', flush=True)
+    # Random warning after response
+    print("[WARN] AudioServer: audio buffer underrun", flush=True)
+""")
+
+    config = AriadneConfig(
+        project=ProjectConfig(
+            name="GodotNoiseTest",
+            command=f'python "{script_path}"',
+            seed_timeout_ms=500,
+        ),
+        rules=RulesConfig(),
+    )
+    vault = VaultManager(tmp_path / "vault.jsonl")
+    runner = LabyrinthosRunner(config, vault_manager=vault)
+
+    try:
+        for seed in [1, 2, 3]:
+            res = runner.test_single_seed(seed)
+            assert res.status == "pass", f"Failed to filter engine noise on seed {seed}: {res.error_message}"
+            assert res.grid is not None
+            assert res.grid.width == 3
+            assert res.grid.height == 3
+    finally:
+        runner.close()

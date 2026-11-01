@@ -48,7 +48,59 @@ def check_reachability(
                     visited.add((nx, ny))
                     queue.append((nx, ny))
 
-    return False, f"Exit '{to_target}' at {exit_pos} is unreachable from '{from_target}' at {start_pos}", visited
+    return (
+        False,
+        f"Exit '{to_target}' at (x={exit_pos[0]}, y={exit_pos[1]}) is unreachable from '{from_target}' at (x={start_pos[0]}, y={start_pos[1]})",
+        visited,
+    )
+
+
+def find_single_wall_fix_candidates(
+    grid: WorldGrid,
+    from_target: str = "@",
+    to_target: str = ">"
+) -> List[Tuple[int, int]]:
+    """
+    Find wall tiles '#' that, if turned into walkable floor, connect `from_target` to `to_target`.
+    Uses forward BFS from start and backward BFS from exit; walls touching both components are candidates.
+    """
+    start_pos = grid.find_first(from_target)
+    exit_pos = grid.find_first(to_target)
+    if not start_pos or not exit_pos:
+        return []
+
+    # 1. Forward flood-fill from start
+    fwd_queue: deque[Tuple[int, int]] = deque([start_pos])
+    fwd_visited: Set[Tuple[int, int]] = {start_pos}
+    while fwd_queue:
+        cx, cy = fwd_queue.popleft()
+        for nx, ny in get_neighbors(cx, cy, grid.width, grid.height):
+            if (nx, ny) not in fwd_visited and grid.get_semantic(nx, ny) != "wall":
+                fwd_visited.add((nx, ny))
+                fwd_queue.append((nx, ny))
+
+    # 2. Backward flood-fill from exit
+    bwd_queue: deque[Tuple[int, int]] = deque([exit_pos])
+    bwd_visited: Set[Tuple[int, int]] = {exit_pos}
+    while bwd_queue:
+        cx, cy = bwd_queue.popleft()
+        for nx, ny in get_neighbors(cx, cy, grid.width, grid.height):
+            if (nx, ny) not in bwd_visited and grid.get_semantic(nx, ny) != "wall":
+                bwd_visited.add((nx, ny))
+                bwd_queue.append((nx, ny))
+
+    # 3. Candidate walls touch at least one start-connected tile and one exit-connected tile
+    candidates: List[Tuple[int, int]] = []
+    for y in range(grid.height):
+        for x in range(grid.width):
+            if grid.get_semantic(x, y) == "wall":
+                nbrs = get_neighbors(x, y, grid.width, grid.height)
+                touches_start = any(n in fwd_visited for n in nbrs)
+                touches_exit = any(n in bwd_visited for n in nbrs)
+                if touches_start and touches_exit:
+                    candidates.append((x, y))
+
+    return candidates
 
 
 def check_connected_walkable(grid: WorldGrid) -> Tuple[bool, str, Set[Tuple[int, int]]]:
